@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>장바구니 | Wow Market</title>
+    <link rel="stylesheet" href="/css/shop.css">
+</head>
+<body>
+<header class="nav">
+    <a class="brand" href="/">WOW MARKET</a>
+    <nav><a href="/">Shop</a><a href="/orders.html">Orders</a></nav>
+</header>
+<main>
+    <section class="section-head">
+        <div>
+            <p class="eyebrow">Your bag</p>
+            <h2>장바구니</h2>
+        </div>
+    </section>
+    <section class="cart-layout">
+        <div class="cart-list" id="cart-list"></div>
+        <aside class="summary">
+            <span>Total</span>
+            <strong id="cart-total">0원</strong>
+            <button type="button" id="checkout">결제하기</button>
+        </aside>
+    </section>
+</main>
+<script src="/js/products.js"></script>
+<script src="/js/app.js"></script>
+<script>
+const cart = getCart();
+const list = document.getElementById("cart-list");
+const totalEl = document.getElementById("cart-total");
+const checkout = document.getElementById("checkout");
+
+function renderCart() {
+  const items = getCart();
+  if (items.length === 0) {
+    list.innerHTML = `<p class="empty">아직 담긴 상품이 없습니다.</p>`;
+    totalEl.textContent = "0원";
+    checkout.disabled = true;
+    return;
+  }
+
+  list.innerHTML = items.map((item) => {
+    const product = findProduct(item.productId);
+    if (!product) return "";
+    return `
+      <article class="cart-row">
+        <img src="${product.imageUrl}" alt="${product.name}">
+        <div>
+          <h3>${product.name}</h3>
+          <p>${item.quantity}개</p>
+        </div>
+        <strong>${formatPrice(product.price * item.quantity)}</strong>
+        <button type="button" data-remove="${product.id}">삭제</button>
+      </article>
+    `;
+  }).join("");
+
+  totalEl.textContent = formatPrice(cartTotal(items));
+  checkout.disabled = false;
+
+  list.querySelectorAll("[data-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      removeFromCart(button.dataset.remove);
+      renderCart();
+    });
+  });
+}
+
+checkout.addEventListener("click", () => {
+  const items = getCart();
+  if (items.length === 0) return;
+  const orders = getOrders();
+  orders.unshift({
+    id: Date.now(),
+    createdAt: new Date().toLocaleString("ko-KR"),
+    total: cartTotal(items),
+    items: items.map((item) => ({ ...item, product: findProduct(item.productId) }))
+  });
+  saveOrders(orders);
+  saveCart([]);
+  window.location.href = "/orders.html";
+});
+
+renderCart();
+</script>
+</body>
+</html>

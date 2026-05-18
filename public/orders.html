@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>주문 내역 | Wow Market</title>
+    <link rel="stylesheet" href="/css/shop.css">
+</head>
+<body>
+<header class="nav">
+    <a class="brand" href="/">WOW MARKET</a>
+    <nav><a href="/">Shop</a><a href="/cart.html">Cart</a></nav>
+</header>
+<main>
+    <section class="section-head">
+        <div>
+            <p class="eyebrow">Orders</p>
+            <h2>주문 내역</h2>
+        </div>
+    </section>
+    <section class="orders-list" id="orders-list"></section>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const orders = getOrders();
+const root = document.getElementById("orders-list");
+
+if (orders.length === 0) {
+  root.innerHTML = `<p class="empty">아직 주문 내역이 없습니다. 장바구니에서 결제를 진행해보세요.</p>`;
+} else {
+  root.innerHTML = orders.map((order) => `
+    <article class="order-card">
+      <header>
+        <strong>주문 #${order.id}</strong>
+        <span>${order.createdAt}</span>
+      </header>
+      <ul>
+        ${order.items.map((item) => `<li>${item.product?.name || "상품"} · ${item.quantity}개</li>`).join("")}
+      </ul>
+      <footer>${formatPrice(order.total)}</footer>
+    </article>
+  `).join("");
+}
+</script>
+</body>
+</html>

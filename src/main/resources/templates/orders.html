@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orders</title>
+    <link rel="stylesheet" href="/css/shop.css">
+</head>
+<body>
+<header class="nav">
+    <a class="brand" href="/">WOW SHOP</a>
+    <nav><a href="/">Shop</a><a href="/cart">Cart</a></nav>
+</header>
+<main>
+    <section class="section-head">
+        <div>
+            <p class="eyebrow">Order history</p>
+            <h2>주문 내역</h2>
+        </div>
+        <p class="success" th:text="${message}"></p>
+    </section>
+    <section class="orders">
+        <article class="order-card" th:each="order : ${orders}">
+            <div>
+                <h3 th:text="'주문 #' + ${order.id}">주문</h3>
+                <p th:text="${order.status}">PAID</p>
+            </div>
+            <strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA')} + '원'">0원</strong>
+        </article>
+        <p class="empty" th:if="${#lists.isEmpty(orders)}">주문 내역이 없습니다.</p>
+    </section>
+</main>
+</body>
+</html>

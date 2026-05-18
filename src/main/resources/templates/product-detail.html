@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.name}">Product</title>
+    <link rel="stylesheet" href="/css/shop.css">
+</head>
+<body>
+<header class="nav">
+    <a class="brand" href="/">WOW SHOP</a>
+    <nav><a href="/">Shop</a><a href="/cart">Cart</a><a href="/orders">Orders</a></nav>
+</header>
+<main>
+    <section class="detail">
+        <img th:src="${product.imageUrl}" th:alt="${product.name}">
+        <div>
+            <p class="eyebrow" th:text="${product.category}">TECH</p>
+            <h1 th:text="${product.name}">Product</h1>
+            <p th:text="${product.description}">description</p>
+            <strong th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">129,000원</strong>
+            <p class="stock" th:text="'남은 수량 ' + ${product.stockQuantity} + '개'">남은 수량</p>
+            <form method="post" th:action="@{/cart/items}" class="buy-box">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <input type="number" name="quantity" value="1" min="1" max="9">
+                <button type="submit">장바구니 담기</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

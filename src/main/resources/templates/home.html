@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wow Market</title>
+    <link rel="stylesheet" href="/css/shop.css">
+</head>
+<body>
+<header class="market-header">
+    <div class="utility">
+        <span>오늘 주문하면 내일 도착 보장</span>
+        <div>
+            <a th:if="${username == null}" href="/login">로그인</a>
+            <a th:if="${username == null}" href="/signup">회원가입</a>
+            <a th:if="${username != null}" href="/orders">주문배송</a>
+            <a th:if="${username != null}" href="/cart">장바구니</a>
+            <form th:if="${username != null}" method="post" th:action="@{/logout}">
+                <button type="submit">로그아웃</button>
+            </form>
+        </div>
+    </div>
+    <div class="search-row">
+        <a class="brand" href="/">WOW MARKET</a>
+        <form class="search-box" method="get" action="/">
+            <input type="search" name="keyword" placeholder="찾고 싶은 상품을 검색해보세요">
+            <button type="submit">검색</button>
+        </form>
+        <a class="cart-link" href="/cart">Cart</a>
+    </div>
+    <nav class="category-tabs">
+        <a th:classappend="${category == 'ALL'} ? 'active'" href="/?category=ALL">전체</a>
+        <a th:classappend="${category == 'FASHION'} ? 'active'" href="/?category=FASHION">패션</a>
+        <a th:classappend="${category == 'TECH'} ? 'active'" href="/?category=TECH">디지털</a>
+        <a th:classappend="${category == 'LIVING'} ? 'active'" href="/?category=LIVING">리빙</a>
+        <a href="#ranking">베스트</a>
+        <a href="#star">오늘도착</a>
+    </nav>
+</header>
+
+<main class="market-main">
+    <section class="commerce-shell">
+        <aside class="category-rail">
+            <strong>전체 카테고리</strong>
+            <a href="/?category=FASHION">패션의류</a>
+            <a href="/?category=TECH">디지털/가전</a>
+            <a href="/?category=LIVING">생활/주방</a>
+            <a href="/">슈퍼딜</a>
+            <a href="/">브랜드관</a>
+            <a href="/">선물하기</a>
+        </aside>
+
+        <section class="hero-market">
+            <div>
+                <p>WOW BIG DEAL</p>
+                <h1>지금 가장 잘 팔리는 상품을 한눈에</h1>
+                <span>면접 시연에 딱 맞는 검색, 회원, 장바구니, 주문 흐름을 갖춘 Spring Boot 쇼핑몰</span>
+                <div class="hero-actions">
+                    <a class="primary" href="#deals">특가 보기</a>
+                    <a class="secondary" href="/signup">회원가입</a>
+                </div>
+            </div>
+        </section>
+
+        <aside class="benefit-panel">
+            <strong>회원 혜택</strong>
+            <p>신규 가입 10% 쿠폰</p>
+            <p>무료배송 상품 모음</p>
+            <p>오늘 도착 추천</p>
+            <a href="/signup">혜택 받고 시작</a>
+        </aside>
+    </section>
+
+    <section class="quick-menu" aria-label="빠른 메뉴">
+        <a href="/?category=FASHION"><span>01</span>패션위크</a>
+        <a href="/?category=TECH"><span>02</span>디지털딜</a>
+        <a href="/?category=LIVING"><span>03</span>리빙페어</a>
+        <a href="#ranking"><span>04</span>랭킹</a>
+        <a href="/cart"><span>05</span>장바구니</a>
+        <a href="/orders"><span>06</span>주문조회</a>
+    </section>
+
+    <section id="deals" class="section-title">
+        <div>
+            <p>Super Deal</p>
+            <h2 th:text="${category == 'ALL' ? '오늘의 쇼핑 특가' : category + ' 추천 특가'}">오늘의 쇼핑 특가</h2>
+        </div>
+        <a href="/?category=ALL">전체보기</a>
+    </section>
+
+    <section class="deal-grid">
+        <article class="deal-card" th:each="product, stat : ${products}">
+            <a th:href="@{/products/{id}(id=${product.id})}">
+                <div class="deal-image">
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}">
+                    <span th:text="${product.badge}">BEST</span>
+                </div>
+                <div class="deal-body">
+                    <p th:text="${product.category}">TECH</p>
+                    <h3 th:text="${product.name}">Product</h3>
+                    <div class="price-row">
+                        <em th:text="${15 + stat.index * 7} + '%'">22%</em>
+                        <strong th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">129,000원</strong>
+                    </div>
+                    <small>무료배송 · WOW 멤버 적립</small>
+                </div>
+            </a>
+            <form method="post" th:action="@{/cart/items}">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit">장바구니 담기</button>
+            </form>
+        </article>
+    </section>
+
+    <section id="ranking" class="ranking-layout">
+        <div class="ranking-box">
+            <div class="section-title compact">
+                <div>
+                    <p>Live Ranking</p>
+                    <h2>지금 제일 잘 나가는 상품</h2>
+                </div>
+            </div>
+            <ol>
+                <li th:each="product, stat : ${products}">
+                    <span th:text="${stat.index + 1}">1</span>
+                    <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}">Product</a>
+                    <strong th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">0원</strong>
+                </li>
+            </ol>
+        </div>
+        <div id="star" class="arrival-box">
+            <p>Star Delivery</p>
+            <h2>오늘 주문 내일 도착</h2>
+            <span>재고가 있는 상품만 엄선해서 빠르게 보여주는 배송 보장 섹션입니다.</span>
+            <a href="/?category=LIVING">배송 상품 보기</a>
+        </div>
+    </section>
+</main>
+<aside class="chatbot" data-chatbot>
+    <button class="chatbot-toggle" type="button" data-chatbot-toggle>
+        <span>AI</span>
+        쇼핑 상담
+    </button>
+    <section class="chatbot-panel" aria-label="AI 쇼핑 상담">
+        <header>
+            <div>
+                <strong>WOW AI 상담원</strong>
+                <p>상품 추천부터 주문 안내까지 도와드려요.</p>
+            </div>
+            <button type="button" data-chatbot-close>닫기</button>
+        </header>
+        <div class="chatbot-messages" data-chatbot-messages>
+            <div class="message bot">안녕하세요. 어떤 상품을 찾고 계신가요?</div>
+        </div>
+        <form class="chatbot-form" data-chatbot-form>
+            <input type="text" name="message" placeholder="예: 선물용으로 좋은 상품 추천해줘" autocomplete="off" maxlength="1000">
+            <button type="submit">전송</button>
+        </form>
+    </section>
+</aside>
+<script src="/js/chatbot.js"></script>
+</body>
+</html>
